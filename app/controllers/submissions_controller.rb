@@ -1,10 +1,10 @@
 class SubmissionsController < ApplicationController
   before_action :set_submission, only: [:show, :edit, :update, :destroy]
-  before_filter :authentication_user!, except: [:index, :show]
+  before_filter :authenticate_user!, except: [:index, :show]
   # GET /submissions
   # GET /submissions.json
   def index
-    @submissions = Submission.all
+    @submissions = Submission.order(cached_votes_total: :desc)
   end
 
   # GET /submissions/1
@@ -62,6 +62,28 @@ class SubmissionsController < ApplicationController
       format.json { head :no_content }
     end
   end
+
+
+
+  def upvote
+    @submission = Submission.find(params[:id])
+
+    #assign upvote to current user
+    @submission.upvote_by current_user
+    redirect_to :back
+  end
+
+  def downvote
+    @submission = Submission.find(params[:id])
+
+    #assign upvote to current user
+    @submission.downvote_by current_user
+    redirect_to :back
+  end
+
+
+
+
 
   private
     # Use callbacks to share common setup or constraints between actions.
